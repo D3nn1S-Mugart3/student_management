@@ -45,7 +45,7 @@ class _StudentPageState extends State<StudentPage> {
       correoController.text = student.correo;
       telefonoController.text = student.telefono;
       direccionController.text = student.direccion;
-      nacimientoController.text = student.nacimiento.toString();
+    
       generoController.text = student.genero;
       gradoController.text = student.grado;
       nombreTutorController.text = student.nombreTutor;
@@ -58,16 +58,13 @@ class _StudentPageState extends State<StudentPage> {
       builder: (_) => AlertDialog(
         title:
             Text(student == null ? 'Agregar estudiante' : 'Editar estudiante'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
+        content: SingleChildScrollView(
+             child: ListBody(
+              children: [
             TextField(
                 controller: nombreController,
                 decoration: const InputDecoration(labelText: 'Nombre')),
-            TextField(
-                controller: nacimientoController,
-                decoration:
-                    const InputDecoration(labelText: 'Fecha de Nacimiento')),
+          
             TextField(
                 controller: generoController,
                 decoration: const InputDecoration(labelText: 'Género')),
@@ -96,7 +93,8 @@ class _StudentPageState extends State<StudentPage> {
                 controller: promedioCalificacionController,
                 decoration: const InputDecoration(labelText: 'Promedio (GPA)'),
                 keyboardType: TextInputType.number),
-          ],
+             ]
+             ),
         ),
         actions: [
           TextButton(
@@ -108,8 +106,7 @@ class _StudentPageState extends State<StudentPage> {
                   edadController.text.isNotEmpty) {
                 int age = int.parse(edadController.text);
                 double gpa = double.parse(promedioCalificacionController.text);
-                DateTime dateOfBirth =
-                    DateTime.parse(nacimientoController.text);
+              
 
                 if (student == null) {
                   await databaseStudents.insertEstudiante(Student(
@@ -119,7 +116,7 @@ class _StudentPageState extends State<StudentPage> {
                     correo: correoController.text,
                     telefono: telefonoController.text,
                     direccion: direccionController.text,
-                    nacimiento: dateOfBirth,
+                   
                     genero: generoController.text,
                     grado: gradoController.text,
                     nombreTutor: nombreTutorController.text,
@@ -135,7 +132,7 @@ class _StudentPageState extends State<StudentPage> {
                     correo: correoController.text,
                     telefono: telefonoController.text,
                     direccion: direccionController.text,
-                    nacimiento: dateOfBirth,
+                  
                     genero: generoController.text,
                     grado: gradoController.text,
                     nombreTutor: nombreTutorController.text,
@@ -170,7 +167,22 @@ class _StudentPageState extends State<StudentPage> {
           final student = students[index];
           return ListTile(
             title: Text(student.nombre),
-            subtitle: Text(student.correo),
+            subtitle: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(student.correo),
+                Row(
+                  children: [
+                      Text("Edad: ${student.edad.toString()}"),
+                      SizedBox(
+                        width: 10,
+                      ),
+                      Text("Promedio : ${student.promedioCalificacion.toString()}")
+                  ],
+                )
+                
+              ],
+            ),
             trailing: Row(
               mainAxisSize: MainAxisSize.min,
               children: [

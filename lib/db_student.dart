@@ -33,7 +33,6 @@ class DatabaseStudents {
         correo TEXT NOT NULL,
         telefono TEXT,
         direccion TEXT,
-        nacimiento TEXT,
         genero TEXT,
         grado TEXT,
         nombreTutor TEXT,

@@ -6,7 +6,6 @@ class Student {
   String correo;
   String telefono;
   String direccion;
-  DateTime nacimiento;
   String genero;
   String grado;
   String nombreTutor;
@@ -22,7 +21,7 @@ class Student {
     required this.correo,
     required this.telefono,
     required this.direccion,
-    required this.nacimiento,
+  
     required this.genero,
     required this.grado,
     required this.nombreTutor,
@@ -40,7 +39,7 @@ class Student {
       'correo': correo,
       'telefono': telefono,
       'direccion': direccion,
-      'nacimiento': nacimiento.toIso8601String(),
+    
       'genero': genero,
       'grado': grado,
       'nombreTutor': nombreTutor,
@@ -59,7 +58,7 @@ class Student {
       correo: map['correo'],
       telefono: map['telefono'],
       direccion: map['direccion'],
-      nacimiento: DateTime.parse(map['nacimiento']),
+    
       genero: map['genero'],
       grado: map['grado'],
       nombreTutor: map['nombreTutor'],
