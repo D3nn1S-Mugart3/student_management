@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:student_management/db_student.dart';
 import 'package:student_management/models/student.dart';
 
@@ -18,12 +19,10 @@ class _StudentPageState extends State<StudentPage> {
   final TextEditingController correoController = TextEditingController();
   final TextEditingController telefonoController = TextEditingController();
   final TextEditingController direccionController = TextEditingController();
-  final TextEditingController nacimientoController = TextEditingController();
   final TextEditingController generoController = TextEditingController();
   final TextEditingController gradoController = TextEditingController();
   final TextEditingController nombreTutorController = TextEditingController();
-  final TextEditingController promedioCalificacionController =
-      TextEditingController();
+  final TextEditingController promedioCalificacionController = TextEditingController();
 
   @override
   void initState() {
@@ -45,68 +44,75 @@ class _StudentPageState extends State<StudentPage> {
       correoController.text = student.correo;
       telefonoController.text = student.telefono;
       direccionController.text = student.direccion;
-    
       generoController.text = student.genero;
       gradoController.text = student.grado;
       nombreTutorController.text = student.nombreTutor;
-      promedioCalificacionController.text =
-          student.promedioCalificacion.toString();
+      promedioCalificacionController.text = student.promedioCalificacion.toString();
     }
 
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
-        title:
-            Text(student == null ? 'Agregar estudiante' : 'Editar estudiante'),
+        title: Text(student == null ? 'Agregar estudiante' : 'Editar estudiante'),
         content: SingleChildScrollView(
-             child: ListBody(
-              children: [
-            TextField(
+          child: ListBody(
+            children: [
+              TextField(
                 controller: nombreController,
-                decoration: const InputDecoration(labelText: 'Nombre')),
-          
-            TextField(
+                decoration: const InputDecoration(labelText: 'Nombre'),
+              ),
+              TextField(
                 controller: generoController,
-                decoration: const InputDecoration(labelText: 'Género')),
-            TextField(
+                decoration: const InputDecoration(labelText: 'Género'),
+              ),
+              TextField(
                 controller: edadController,
                 decoration: const InputDecoration(labelText: 'Edad'),
-                keyboardType: TextInputType.number),
-            TextField(
+                keyboardType: TextInputType.number,
+              ),
+              TextField(
                 controller: correoController,
-                decoration:
-                    const InputDecoration(labelText: 'Correo Electrónico')),
-            TextField(
+                decoration: const InputDecoration(labelText: 'Correo Electrónico'),
+              ),
+              TextField(
                 controller: telefonoController,
-                decoration: const InputDecoration(labelText: 'Teléfono')),
-            TextField(
+                decoration: const InputDecoration(labelText: 'Teléfono'),
+              ),
+              TextField(
                 controller: direccionController,
-                decoration: const InputDecoration(labelText: 'Dirección')),
-            TextField(
+                decoration: const InputDecoration(labelText: 'Dirección'),
+              ),
+              TextField(
                 controller: gradoController,
-                decoration: const InputDecoration(labelText: 'Grado')),
-            TextField(
+                decoration: const InputDecoration(labelText: 'Grado'),
+              ),
+              TextField(
                 controller: nombreTutorController,
-                decoration:
-                    const InputDecoration(labelText: 'Nombre del Tutor')),
-            TextField(
+                decoration: const InputDecoration(labelText: 'Nombre del Tutor'),
+              ),
+              TextField(
                 controller: promedioCalificacionController,
                 decoration: const InputDecoration(labelText: 'Promedio (GPA)'),
-                keyboardType: TextInputType.number),
-             ]
-             ),
+                keyboardType: TextInputType.number,
+              ),
+            ],
+          ),
         ),
         actions: [
           TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: const Text('Cancelar')),
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('Cancelar'),
+          ),
           ElevatedButton(
             onPressed: () async {
-              if (nombreController.text.isNotEmpty &&
-                  edadController.text.isNotEmpty) {
+              if (nombreController.text.isEmpty || edadController.text.isEmpty || correoController.text.isEmpty || telefonoController.text.isEmpty || direccionController.text.isEmpty || generoController.text.isEmpty || gradoController.text.isEmpty || nombreTutorController.text.isEmpty || promedioCalificacionController.text.isEmpty) {
+                _showFieldErrorAlert();
+                return;
+              }
+
+              try {
                 int age = int.parse(edadController.text);
                 double gpa = double.parse(promedioCalificacionController.text);
-              
 
                 if (student == null) {
                   await databaseStudents.insertEstudiante(Student(
@@ -116,7 +122,6 @@ class _StudentPageState extends State<StudentPage> {
                     correo: correoController.text,
                     telefono: telefonoController.text,
                     direccion: direccionController.text,
-                   
                     genero: generoController.text,
                     grado: gradoController.text,
                     nombreTutor: nombreTutorController.text,
@@ -132,7 +137,6 @@ class _StudentPageState extends State<StudentPage> {
                     correo: correoController.text,
                     telefono: telefonoController.text,
                     direccion: direccionController.text,
-                  
                     genero: generoController.text,
                     grado: gradoController.text,
                     nombreTutor: nombreTutorController.text,
@@ -143,6 +147,9 @@ class _StudentPageState extends State<StudentPage> {
 
                 Navigator.of(context).pop();
                 _loadStudents();
+                _showSuccessAlert();
+              } catch (e) {
+                _showErrorAlert();
               }
             },
             child: const Text('Guardar'),
@@ -152,9 +159,68 @@ class _StudentPageState extends State<StudentPage> {
     );
   }
 
-  void _deleteStudent(int id) async {
+  void _confirmDeleteStudent(Student student) {
+    AwesomeDialog(
+      context: context,
+      dialogType: DialogType.warning,
+      animType: AnimType.bottomSlide,
+      title: 'Confirmar eliminación',
+      desc: '¿Deseas eliminar a ${student.nombre}?',
+      btnCancelOnPress: () {},
+      btnOkOnPress: () async {
+        await _deleteStudent(student.id!);
+      },
+    )..show();
+  }
+
+  Future<void> _deleteStudent(int id) async {
     await databaseStudents.deleteEstudiante(id);
     _loadStudents();
+    _showDeleteAlert();
+  }
+
+  void _showFieldErrorAlert() {
+    AwesomeDialog(
+      context: context,
+      dialogType: DialogType.warning,
+      animType: AnimType.bottomSlide,
+      title: 'Advertencia',
+      desc: 'Por favor, completa todos los campos requeridos.',
+      btnOkOnPress: () {},
+    )..show();
+  }
+
+  void _showSuccessAlert() {
+    AwesomeDialog(
+      context: context,
+      dialogType: DialogType.success,
+      animType: AnimType.bottomSlide,
+      title: 'Éxito',
+      desc: 'Estudiante guardado con éxito',
+      btnOkOnPress: () {},
+    )..show();
+  }
+
+  void _showErrorAlert() {
+    AwesomeDialog(
+      context: context,
+      dialogType: DialogType.error,
+      animType: AnimType.bottomSlide,
+      title: 'Error',
+      desc: 'Error al guardar el estudiante',
+      btnOkOnPress: () {},
+    )..show();
+  }
+
+  void _showDeleteAlert() {
+    AwesomeDialog(
+      context: context,
+      dialogType: DialogType.success,
+      animType: AnimType.bottomSlide,
+      title: 'Eliminado',
+      desc: 'Estudiante eliminado',
+      btnOkOnPress: () {},
+    )..show();
   }
 
   @override
@@ -173,32 +239,27 @@ class _StudentPageState extends State<StudentPage> {
                 Text(student.correo),
                 Row(
                   children: [
-                      Text("Edad: ${student.edad.toString()}"),
-                      SizedBox(
-                        width: 10,
-                      ),
-                      Text("Promedio : ${student.promedioCalificacion.toString()}")
+                    Text("Edad: ${student.edad.toString()}"),
+                    SizedBox(width: 10),
+                    Text("Promedio: ${student.promedioCalificacion.toString()}")
                   ],
                 )
-                
               ],
             ),
             trailing: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                IconButton(
-                    icon: const Icon(Icons.edit),
-                    onPressed: () => _showForm(student)),
-                IconButton(
-                    icon: const Icon(Icons.delete),
-                    onPressed: () => _deleteStudent(student.id!)),
+                IconButton(icon: const Icon(Icons.edit), onPressed: () => _showForm(student)),
+                IconButton(icon: const Icon(Icons.delete), onPressed: () => _confirmDeleteStudent(student)),
               ],
             ),
           );
         },
       ),
       floatingActionButton: FloatingActionButton(
-          onPressed: () => _showForm(), child: const Icon(Icons.add)),
+        onPressed: () => _showForm(),
+        child: const Icon(Icons.add),
+      ),
     );
   }
 }
