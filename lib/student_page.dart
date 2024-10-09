@@ -236,6 +236,82 @@ class _StudentPageState extends State<StudentPage> {
     ).show();
   }
 
+  void _showStudentDetails(Student student) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(25.0)),
+      ),
+      builder: (BuildContext context) {
+        return Padding(
+          padding: const EdgeInsets.all(20.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  CircleAvatar(
+                    radius: 30,
+                    backgroundColor: Colors.blueAccent,
+                    child: Text(
+                      student.nombre[0].toUpperCase(),
+                      style: const TextStyle(color: Colors.white, fontSize: 30),
+                    ),
+                  ),
+                  const SizedBox(width: 15),
+                  Text(
+                    student.nombre,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 24,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 20),
+              _buildDetailRow(Icons.person, "Género", student.genero),
+              _buildDetailRow(
+                  Icons.calendar_today, "Edad", "${student.edad} años"),
+              _buildDetailRow(Icons.email, "Correo", student.correo),
+              _buildDetailRow(Icons.phone, "Teléfono", student.telefono),
+              _buildDetailRow(Icons.home, "Dirección", student.direccion),
+              _buildDetailRow(Icons.school, "Grado", student.grado),
+              _buildDetailRow(
+                  Icons.supervisor_account, "Tutor", student.nombreTutor),
+              _buildDetailRow(Icons.star, "Promedio (GPA)",
+                  student.promedioCalificacion.toString()),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildDetailRow(IconData icon, String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 5.0),
+      child: Row(
+        children: [
+          Icon(icon, color: Colors.blueAccent),
+          const SizedBox(width: 10),
+          Text(
+            "$label: ",
+            style: const TextStyle(fontWeight: FontWeight.bold),
+          ),
+          Expanded(
+            child: Text(
+              value,
+              style: const TextStyle(fontSize: 16),
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -289,6 +365,8 @@ class _StudentPageState extends State<StudentPage> {
                         ),
                       ],
                     ),
+                    onTap: () =>
+                        _showStudentDetails(student), // Añadimos esta línea
                     trailing: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
