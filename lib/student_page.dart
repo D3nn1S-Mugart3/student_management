@@ -22,7 +22,8 @@ class _StudentPageState extends State<StudentPage> {
   final TextEditingController generoController = TextEditingController();
   final TextEditingController gradoController = TextEditingController();
   final TextEditingController nombreTutorController = TextEditingController();
-  final TextEditingController promedioCalificacionController = TextEditingController();
+  final TextEditingController promedioCalificacionController =
+      TextEditingController();
 
   @override
   void initState() {
@@ -47,13 +48,15 @@ class _StudentPageState extends State<StudentPage> {
       generoController.text = student.genero;
       gradoController.text = student.grado;
       nombreTutorController.text = student.nombreTutor;
-      promedioCalificacionController.text = student.promedioCalificacion.toString();
+      promedioCalificacionController.text =
+          student.promedioCalificacion.toString();
     }
 
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
-        title: Text(student == null ? 'Agregar estudiante' : 'Editar estudiante'),
+        title:
+            Text(student == null ? 'Agregar estudiante' : 'Editar estudiante'),
         content: SingleChildScrollView(
           child: ListBody(
             children: [
@@ -72,7 +75,8 @@ class _StudentPageState extends State<StudentPage> {
               ),
               TextField(
                 controller: correoController,
-                decoration: const InputDecoration(labelText: 'Correo Electrónico'),
+                decoration:
+                    const InputDecoration(labelText: 'Correo Electrónico'),
               ),
               TextField(
                 controller: telefonoController,
@@ -88,7 +92,8 @@ class _StudentPageState extends State<StudentPage> {
               ),
               TextField(
                 controller: nombreTutorController,
-                decoration: const InputDecoration(labelText: 'Nombre del Tutor'),
+                decoration:
+                    const InputDecoration(labelText: 'Nombre del Tutor'),
               ),
               TextField(
                 controller: promedioCalificacionController,
@@ -105,7 +110,15 @@ class _StudentPageState extends State<StudentPage> {
           ),
           ElevatedButton(
             onPressed: () async {
-              if (nombreController.text.isEmpty || edadController.text.isEmpty || correoController.text.isEmpty || telefonoController.text.isEmpty || direccionController.text.isEmpty || generoController.text.isEmpty || gradoController.text.isEmpty || nombreTutorController.text.isEmpty || promedioCalificacionController.text.isEmpty) {
+              if (nombreController.text.isEmpty ||
+                  edadController.text.isEmpty ||
+                  correoController.text.isEmpty ||
+                  telefonoController.text.isEmpty ||
+                  direccionController.text.isEmpty ||
+                  generoController.text.isEmpty ||
+                  gradoController.text.isEmpty ||
+                  nombreTutorController.text.isEmpty ||
+                  promedioCalificacionController.text.isEmpty) {
                 _showFieldErrorAlert();
                 return;
               }
@@ -170,7 +183,7 @@ class _StudentPageState extends State<StudentPage> {
       btnOkOnPress: () async {
         await _deleteStudent(student.id!);
       },
-    )..show();
+    ).show();
   }
 
   Future<void> _deleteStudent(int id) async {
@@ -187,7 +200,7 @@ class _StudentPageState extends State<StudentPage> {
       title: 'Advertencia',
       desc: 'Por favor, completa todos los campos requeridos.',
       btnOkOnPress: () {},
-    )..show();
+    ).show();
   }
 
   void _showSuccessAlert() {
@@ -198,7 +211,7 @@ class _StudentPageState extends State<StudentPage> {
       title: 'Éxito',
       desc: 'Estudiante guardado con éxito',
       btnOkOnPress: () {},
-    )..show();
+    ).show();
   }
 
   void _showErrorAlert() {
@@ -209,7 +222,7 @@ class _StudentPageState extends State<StudentPage> {
       title: 'Error',
       desc: 'Error al guardar el estudiante',
       btnOkOnPress: () {},
-    )..show();
+    ).show();
   }
 
   void _showDeleteAlert() {
@@ -220,44 +233,84 @@ class _StudentPageState extends State<StudentPage> {
       title: 'Eliminado',
       desc: 'Estudiante eliminado',
       btnOkOnPress: () {},
-    )..show();
+    ).show();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Gestión de estudiantes')),
-      body: ListView.builder(
-        itemCount: students.length,
-        itemBuilder: (context, index) {
-          final student = students[index];
-          return ListTile(
-            title: Text(student.nombre),
-            subtitle: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(student.correo),
-                Row(
-                  children: [
-                    Text("Edad: ${student.edad.toString()}"),
-                    SizedBox(width: 10),
-                    Text("Promedio: ${student.promedioCalificacion.toString()}")
-                  ],
-                )
-              ],
-            ),
-            trailing: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                IconButton(icon: const Icon(Icons.edit), onPressed: () => _showForm(student)),
-                IconButton(icon: const Icon(Icons.delete), onPressed: () => _confirmDeleteStudent(student)),
-              ],
-            ),
-          );
-        },
+      appBar: AppBar(
+        title: const Text('Gestión de Estudiantes'),
+        centerTitle: true,
+        backgroundColor: Colors.blueAccent,
       ),
+      body: students.isEmpty
+          ? const Center(child: Text('No hay estudiantes registrados'))
+          : ListView.builder(
+              itemCount: students.length,
+              padding: const EdgeInsets.all(10.0),
+              itemBuilder: (context, index) {
+                final student = students[index];
+                return Card(
+                  elevation: 5,
+                  margin: const EdgeInsets.symmetric(vertical: 10),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(15),
+                  ),
+                  child: ListTile(
+                    contentPadding: const EdgeInsets.all(15),
+                    leading: CircleAvatar(
+                      radius: 30,
+                      backgroundColor: Colors.blueAccent,
+                      child: Text(
+                        student.nombre[0].toUpperCase(),
+                        style:
+                            const TextStyle(color: Colors.white, fontSize: 20),
+                      ),
+                    ),
+                    title: Text(
+                      student.nombre,
+                      style: const TextStyle(
+                          fontWeight: FontWeight.bold, fontSize: 18),
+                    ),
+                    subtitle: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const SizedBox(height: 5),
+                        Text(
+                          "Correo: ${student.correo}",
+                          style: const TextStyle(fontSize: 14),
+                        ),
+                        const SizedBox(height: 5),
+                        Text(
+                          "Edad: ${student.edad} años | Promedio: ${student.promedioCalificacion}",
+                          style:
+                              const TextStyle(fontSize: 14, color: Colors.grey),
+                        ),
+                      ],
+                    ),
+                    trailing: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        IconButton(
+                          icon: const Icon(Icons.edit,
+                              color: Colors.orangeAccent),
+                          onPressed: () => _showForm(student),
+                        ),
+                        IconButton(
+                          icon:
+                              const Icon(Icons.delete, color: Colors.redAccent),
+                          onPressed: () => _confirmDeleteStudent(student),
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              },
+            ),
       floatingActionButton: FloatingActionButton(
         onPressed: () => _showForm(),
+        backgroundColor: Colors.blueAccent,
         child: const Icon(Icons.add),
       ),
     );
