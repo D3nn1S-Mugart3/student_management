@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:student_management/db_student.dart';
 import 'package:student_management/models/student.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class StudentPage extends StatefulWidget {
   const StudentPage({super.key});
@@ -30,6 +32,35 @@ class _StudentPageState extends State<StudentPage> {
     super.initState();
     _loadStudents();
   }
+
+  Future<void> enviarDatos(Student student) async {
+    final url = Uri.parse('http://10.0.2.2:8000/api/students');
+    final response = await http.post(
+        url,
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode(student.toMap()),
+    );
+
+    if (response.statusCode == 200) {
+        print('Estudiante enviado a MySQL con éxito');
+    } else if (response.statusCode == 400) {
+        print('El estudiante ya existe: ${response.body}');
+    } else {
+        print('Error al enviar estudiante: ${response.body}');
+    }
+}
+
+
+  Future<void> _syncData() async {
+  List<Student> localStudents = await databaseStudents.getEstudiantes();
+
+  for (Student student in localStudents) {
+    await enviarDatos(student);
+  }
+
+  _showSuccessAlert(); // Mensaje de éxito después de sincronizar
+}
+
 
   Future<void> _loadStudents() async {
     final data = await databaseStudents.getEstudiantes();
@@ -214,6 +245,8 @@ class _StudentPageState extends State<StudentPage> {
     ).show();
   }
 
+
+
   void _showErrorAlert() {
     AwesomeDialog(
       context: context,
@@ -386,11 +419,22 @@ class _StudentPageState extends State<StudentPage> {
                 );
               },
             ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => _showForm(),
-        backgroundColor: Colors.blueAccent,
-        child: const Icon(Icons.add),
-      ),
+     floatingActionButton: Column(
+  mainAxisAlignment: MainAxisAlignment.end,
+  children: [
+    FloatingActionButton(
+      onPressed: () => _showForm(),
+      backgroundColor: Colors.blueAccent,
+      child: const Icon(Icons.add),
+    ),
+    SizedBox(height: 16), // Espaciado
+    FloatingActionButton(
+      onPressed: () => _syncData(),
+      backgroundColor: Colors.green,
+      child: const Icon(Icons.sync),
+    ),
+  ],
+),
     );
   }
 }
